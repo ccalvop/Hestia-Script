@@ -1,0 +1,87 @@
+#!/bin/bash
+# Hestia Control Panel installation script
+# Copyright (C) 2018, HestiaCP
+
+# Variables
+VERSION='1.4.0'
+HESTIA='/usr/local/hestia'
+LOG="/root/hst_install_backups/hst_install-$(date +%d%m%Y%H%M%S).log"
+release=$(grep -o "[0-9]*" /etc/debian_version | head -n1)
+os='debian'
+metadata=$(curl -s https://raw.githubusercontent.com/hestiacp/hestiacp/release/install/metadata)
+
+# Improved error handling
+error_handling() {
+    error_message="$1"
+    solution="$2"
+
+    echo "ERROR: ${error_message}"
+    echo "SOLUCIÓN: ${solution}"
+    exit 1
+}
+
+# Check if the script is running as root
+if [ "$(id -u)" -ne 0 ]; then
+    error_handling "Este script debe ser ejecutado como root." "Ejecuta el script como usuario root o utilizando sudo."
+fi
+
+# Check for supported OS
+if ! (echo "$metadata" | grep -q "ID=$os"); then
+    error_handling "Sistema operativo no soportado." "Por favor, use un sistema operativo compatible, como Debian o Ubuntu."
+fi
+
+# Check for compatible OS version
+if ! (echo "$metadata" | grep -q "VER_ID=$release"); then
+    error_handling "La versión de tu sistema operativo no es compatible." "Por favor, actualiza tu sistema operativo a una versión compatible."
+fi
+
+# Check for 64-bit architecture
+if [ "$(uname -m)" != "x86_64" ]; then
+    error_handling "Arquitectura de sistema no soportada." "Por favor, use un sistema de 64 bits."
+fi
+
+# Check for existing control panels
+if [ -e "/usr/local/vesta" ] || [ -e "/usr/local/cpanel" ] || [ -e "/usr/local/directadmin" ] || [ -e "/usr/local/ispconfig" ] || [ -e "/usr/local/webmin" ]; then
+    error_handling "Se ha detectado un panel de control de alojamiento existente en tu servidor." "Por favor, desinstala el panel de control existente antes de continuar."
+fi
+
+# Request user input
+echo "Introduce tu correo electrónico: "
+read email
+echo "Introduce la contraseña para el administrador: "
+read password
+
+# Update system packages
+apt-get update
+apt-get -y upgrade
+
+# Install dependencies and utilities
+# ...
+# ...
+
+# Download and install HestiaCP from GitHub
+# ...
+# ...
+
+# Configure services (Nginx, Apache, Exim, Dovecot, etc.)
+# ...
+# ...
+
+# Configure firewall and set security rules
+# ...
+# ...
+
+# Generate and configure SSL/TLS certificates
+# ...
+# ...
+
+# Configure backup system
+# ...
+# ...
+
+# Clean up system and optimize environment
+# ...
+# ...
+
+# Installation complete
+echo "La instalación de HestiaCP se ha completado con éxito."
